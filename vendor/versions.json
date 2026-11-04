@@ -1,0 +1,12 @@
+{
+  "btstack": {
+    "repository": "https://github.com/bluekitchen/btstack",
+    "commit": "51e11ce3692abfe31b4ee3d66cffdeb1ae1626f2",
+    "scope": "src, SBC codec, yxml, POSIX run loop; unmodified subset"
+  },
+  "portaudio": {
+    "version": "19.7.0",
+    "platform": "macOS arm64",
+    "scope": "header and prebuilt dylib bundled for offline local builds"
+  }
+}

@@ -1,0 +1,16 @@
+build/
+__pycache__/
+*.pyc
+.DS_Store
+*.app/
+config.json
+runtime/
+*.log
+*.sock
+*.p12
+*.pfx
+*.key
+.env*
+.credentials*
+pairings-*
+*.trusted

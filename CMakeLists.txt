@@ -1,0 +1,61 @@
+cmake_minimum_required(VERSION 3.20)
+set(CMAKE_OSX_DEPLOYMENT_TARGET "14.0" CACHE STRING "Minimum macOS")
+project(BluetoothMixer C OBJC)
+set(CMAKE_C_STANDARD 11)
+if(NOT BTSTACK_ROOT)
+  set(BTSTACK_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/vendor/btstack")
+endif()
+if(NOT PORTAUDIO_ROOT)
+  set(PORTAUDIO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/vendor/portaudio")
+endif()
+if(NOT EXISTS "${BTSTACK_ROOT}/src/hci.c")
+  message(FATAL_ERROR "BTstack sources missing: ${BTSTACK_ROOT}")
+endif()
+find_library(PORTAUDIO_LIBRARY NAMES portaudio libportaudio.2.dylib
+  PATHS "${PORTAUDIO_ROOT}/lib" NO_DEFAULT_PATH REQUIRED)
+set(R ${BTSTACK_ROOT})
+include_directories(. ${R}/src ${R}/src/classic ${R}/platform/posix ${R}/3rd-party/yxml
+  ${R}/3rd-party/bluedroid/decoder/include ${R}/3rd-party/bluedroid/encoder/include
+  ${PORTAUDIO_ROOT}/include)
+set(CORE btstack_memory btstack_memory_pool btstack_linked_list btstack_run_loop btstack_util
+  ad_parser btstack_tlv hci hci_cmd hci_dump hci_event hci_event_builder l2cap l2cap_signaling)
+set(CLASSIC sdp_client sdp_util a2dp a2dp_sink a2dp_source avdtp avdtp_util
+  avdtp_acceptor avdtp_initiator avdtp_sink avdtp_source avrcp avrcp_controller avrcp_target
+  btstack_sbc_bluedroid btstack_sbc_decoder_bluedroid btstack_sbc_encoder_bluedroid btstack_sbc_plc)
+foreach(item IN LISTS CORE)
+  list(APPEND SOURCES ${R}/src/${item}.c)
+endforeach()
+foreach(item IN LISTS CLASSIC)
+  list(APPEND SOURCES ${R}/src/classic/${item}.c)
+endforeach()
+file(GLOB DECODER ${R}/3rd-party/bluedroid/decoder/srce/*.c)
+file(GLOB ENCODER ${R}/3rd-party/bluedroid/encoder/srce/*.c)
+add_executable(bluetooth-mixer-engine ${SOURCES} ${DECODER} ${ENCODER}
+  ${R}/platform/posix/btstack_run_loop_posix.c main.c receiver.c mixer.c pair_store.c
+  native_channel.c hci_transport_skywalk.c sdp_server_trace.c)
+target_compile_options(bluetooth-mixer-engine PRIVATE -Wall -Wextra)
+target_link_libraries(bluetooth-mixer-engine PRIVATE ${PORTAUDIO_LIBRARY}
+  "-framework CoreFoundation" "-framework CoreAudio" "-framework IOKit" "-framework IOBluetooth")
+add_executable(bt-power bt_power.m)
+target_compile_options(bt-power PRIVATE -fobjc-arc)
+target_link_libraries(bt-power PRIVATE "-framework Foundation" "-framework IOBluetooth")
+add_executable(mixer-test mixer_test.c mixer.c)
+target_compile_definitions(mixer-test PRIVATE MIXER_NO_AUDIO)
+target_compile_options(mixer-test PRIVATE -Wall -Wextra -Werror)
+add_executable(pair-store-test pair_store_test.c pair_store.c)
+target_compile_options(pair-store-test PRIVATE -Wall -Wextra -Werror)
+add_executable(session-supervisor session_supervisor.c)
+target_compile_options(session-supervisor PRIVATE -Wall -Wextra -Werror)
+add_executable(btmixctl btmixctl.m)
+target_compile_options(btmixctl PRIVATE -fobjc-arc -Wall -Wextra -Werror)
+target_link_libraries(btmixctl PRIVATE "-framework Foundation")
+add_executable(receiver-policy-test ${SOURCES} ${DECODER} ${ENCODER}
+  ${R}/platform/posix/btstack_run_loop_posix.c receiver_policy_test.c receiver.c mixer.c pair_store.c sdp_server_trace.c)
+target_compile_definitions(receiver-policy-test PRIVATE MIXER_NO_AUDIO)
+target_compile_options(receiver-policy-test PRIVATE -Wall -Wextra)
+set(PAIRING_TEST_SOURCES ${SOURCES})
+list(REMOVE_ITEM PAIRING_TEST_SOURCES ${R}/src/hci.c)
+add_executable(receiver-pairing-test ${PAIRING_TEST_SOURCES} hci_pairing_test_shim.c ${DECODER} ${ENCODER}
+  ${R}/platform/posix/btstack_run_loop_posix.c receiver_pairing_test.c receiver.c mixer.c pair_store.c sdp_server_trace.c)
+target_compile_definitions(receiver-pairing-test PRIVATE MIXER_NO_AUDIO)
+target_compile_options(receiver-pairing-test PRIVATE -Wall -Wextra)
