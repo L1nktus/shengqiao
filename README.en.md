@@ -14,7 +14,7 @@ This is a personal-use project. Professional human auditing, ongoing maintenance
 
 ## Before using it
 
-**Experimental software relying on private macOS Skywalk Bluetooth interfaces.** Development and use have primarily taken place on one M4 MacBook Pro. The macOS 14 build target declared in the source is not a compatibility guarantee, and other chips or future macOS updates may not work.
+**Experimental software developed and used on macOS 27 with an M4 MacBook Pro, relying on private macOS Skywalk Bluetooth interfaces.** Actual validation is limited to that environment. Compatibility with other macOS versions, chips, and future updates is unconfirmed.
 
 While receiving, the supervisor temporarily takes over the Mac's built-in Bluetooth controller. This may affect system Bluetooth devices such as headphones, mice, and keyboards. It attempts to restore the previous state when reception stops. **This is not an ordinary player that leaves system Bluetooth unaffected.** The project does not change SIP, install kernel patches, or unload system Bluetooth services. Building and synthetic tests do not take over Bluetooth; real reception requires macOS Bluetooth permission.
 
@@ -31,9 +31,9 @@ Normal app launch starts with reception off. The controller is taken over only a
 
 ## Build
 
-Requirements: an Apple Silicon Mac, Xcode Command Line Tools, CMake 3.20+, and Python 3.
+The actual development and use environment is **macOS 27 on Apple Silicon (M4)**. Building also requires Xcode Command Line Tools, CMake 3.20+, and Python 3. The repository includes a pinned BTstack source subset and a prebuilt arm64 PortAudio 19.7.0 library. That library is a dependency, not pairing data or a personal runtime file.
 
-**The bundled PortAudio binary declares macOS 26.0 as its minimum OS version. Treat builds using that library as requiring macOS 26+. Older systems require a separately rebuilt compatible audio library and remain unverified.** The repository includes a pinned BTstack source subset and a prebuilt arm64 PortAudio 19.7.0 library. That library is a dependency, not pairing data or a personal runtime file.
+The `14.0` values in the build scripts and app metadata are configured minimum deployment targets, not the development OS version or a verified minimum runtime version. The bundled PortAudio library separately declares a minimum OS version of `26.0`; this does not establish that the complete app works on macOS 26. **The documented real-world use is on macOS 27. Compatibility with macOS 14–26 has not been verified.**
 
 ```sh
 python3 build_app.py --output build/声桥.app

@@ -100,4 +100,4 @@ Successful SSP on an admitted connection adds its address to a private per-contr
 
 ## Public-source rebuild note (2026-11-04)
 
-Fresh offline app build/signature verification passed. The bundled PortAudio dylib records LC_BUILD_VERSION minos 26.0 (SDK 26.0); this takes precedence over any impression of a macOS 14 compatibility promise from the project build target. Use macOS 26+ with the included binary, or rebuild/replace PortAudio for an older OS and validate that environment independently. Building and synthetic tests do not start the receiver.
+Fresh offline app build/signature verification passed. The bundled PortAudio dylib records LC_BUILD_VERSION minos 26.0 (SDK 26.0); this takes precedence over any impression of a macOS 14 compatibility promise from the project build target. The library marker is a binary constraint, not evidence that the complete app supports macOS 26. The actual development and use environment is macOS 27 on an M4 MacBook Pro; macOS 14–26 compatibility has not been verified. Building and synthetic tests do not start the receiver.

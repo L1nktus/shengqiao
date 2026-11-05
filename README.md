@@ -14,7 +14,7 @@
 
 ## 使用前了解
 
-**实验性项目，依赖 macOS 私有 Skywalk 蓝牙接口。** 主要在一台 M4 MacBook Pro 上开发和使用；源码声明的 macOS 14 构建目标不代表全版本兼容，也不保证其他芯片或未来系统更新能用。
+**实验性项目，在 macOS 27、M4 MacBook Pro 环境下实现和使用，依赖 macOS 私有 Skywalk 蓝牙接口。** 目前实际验证范围以这套环境为准，其他系统版本、芯片和未来更新的兼容性尚未确认。
 
 接收期间由监督程序暂时接管 Mac 内置蓝牙控制器，可能影响蓝牙耳机、鼠标、键盘等系统蓝牙设备；停止接收后尝试恢复原状态。**不能同时把它当作完全不影响系统蓝牙的普通播放器。** 不修改 SIP、不安装内核补丁、不卸载系统蓝牙服务。编译和模拟测试不需要接管蓝牙，首次真实接收需要 macOS 蓝牙授权。
 
@@ -31,7 +31,9 @@
 
 ## 构建
 
-需要 Apple Silicon Mac、Xcode Command Line Tools、CMake 3.20+、Python 3。**附带的 PortAudio 二进制最低系统标记为 macOS 26.0，因此使用该附带库的构建按 macOS 26+ 对待；更低系统需自行重建兼容音频库，且仍未经过验证。**仓库包含固定版本 BTstack 源码子集与 arm64 PortAudio 19.7.0 预编译库（该库是依赖，不是配对数据或本机运行文件）。
+实际开发和使用环境为 **macOS 27、Apple Silicon（M4）**；构建还需要 Xcode Command Line Tools、CMake 3.20+、Python 3。仓库包含固定版本 BTstack 源码子集与 arm64 PortAudio 19.7.0 预编译库（该库是依赖，不是配对数据或本机运行文件）。
+
+源码中的 `14.0` 是构建脚本和 App 元数据里配置的最低部署目标，并非开发系统版本，也不是已验证的最低运行版本。附带 PortAudio 库另有 `26.0` 最低系统标记；这同样不能证明完整 App 兼容 macOS 26。**本项目目前只明确记录 macOS 27 实际使用，未验证 macOS 14–26 的兼容性。**
 
 ```sh
 python3 build_app.py --output build/声桥.app
